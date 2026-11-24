@@ -1,7 +1,7 @@
 'use client';
 
-import { useMemo, useState } from 'react';
-import { Check, ChevronDown, Minus, Plus, ShoppingBag, UtensilsCrossed, X } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { Check, ChevronDown, Minus, Plus, ShoppingBag, UtensilsCrossed } from 'lucide-react';
 import { lomazaMenu } from '@/lib/lomaza-menu';
 import styles from './qr-menu.module.css';
 
@@ -15,6 +15,11 @@ export default function QrMenu() {
   const [place, setPlace] = useState('Mesa 1');
   const [sent, setSent] = useState(false);
   const [error, setError] = useState('');
+  const [menuUrl, setMenuUrl] = useState('');
+  useEffect(() => {
+    setMenuUrl(window.location.href);
+  }, []);
+
   const categories = ['Todo', ...Array.from(new Set(lomazaMenu.map(item => item.category)))];
   const shown = category === 'Todo' ? lomazaMenu : lomazaMenu.filter(item => item.category === category);
   const total = useMemo(() => cart.reduce((sum, line) => {
@@ -69,7 +74,7 @@ export default function QrMenu() {
       <p className={styles.heroTag}>Hamburguesas · lomos · pizzas · mucho más</p>
       <div className={styles.heroBottom}><span><i/> Abierto · pedidos para salón y para llevar</span><a href="tel:2613350735">📞 261 335 0735</a></div>
     </header>
-    <section className={styles.intro}><div><p className={styles.kicker}>MENÚ DIGITAL</p><h1>Elegí tus favoritos</h1><p>Tu pedido llega directo a cocina. Pagás en el local.</p></div><div className={styles.qrBox}><img src={`https://api.qrserver.com/v1/create-qr-code/?size=112x112&data=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}`} alt="Código QR del menú de Lomaza"/><small>Escaneá para abrir el menú</small></div></section>
+    <section className={styles.intro}><div><p className={styles.kicker}>MENÚ DIGITAL</p><h1>Elegí tus favoritos</h1><p>Tu pedido llega directo a cocina. Pagás en el local.</p></div><div className={styles.qrBox}>{menuUrl ? <img src={`https://api.qrserver.com/v1/create-qr-code/?size=112x112&data=${encodeURIComponent(menuUrl)}`} alt="Código QR del menú de Lomaza"/> : <span aria-hidden="true" style={{ width: 82, height: 82 }}/>}<small>Escaneá para abrir el menú</small></div></section>
     <div className={styles.categoryScroller}>{categories.map(item => <button key={item} className={category === item ? styles.activeCategory : ''} onClick={() => setCategory(item)}>{item}</button>)}</div>
     <section className={styles.menuGrid}>{shown.map(item => {
       const regular = cart.find(line => line.itemId === item.id && !line.dozen)?.quantity ?? 0;
